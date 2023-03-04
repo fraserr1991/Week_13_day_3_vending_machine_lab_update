@@ -6,6 +6,7 @@ import product.Crisps;
 import product.IPurchaseable;
 import product.Product;
 
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -63,23 +64,34 @@ public class VendingMachine {
     }
 
     public Boolean checkCoinIsAccepted(Coin coin) {
-        for(int i = 0; i < validCoins.size(); i++){
-            if(coin.getValue() == validCoins.get(i).getValue()){
+            for (int i = 0; i < validCoins.size(); i++) {
+                if (coin.getValue() == validCoins.get(i).getValue()) {
+                    return true;
+                }
+            }
+            return false;
+    }
+
+    public Boolean checkCoinIsRejected(Coin coin) {
+        for (int i = 0; i < rejectedCoins.size(); i++) {
+            if (coin.getValue() == rejectedCoins.get(i).getValue()) {
                 return true;
-            } else if(coin.getValue() == rejectedCoins.get(i).getValue()){
-                System.out.println("coin not accepted");
-                returnedCoins.add(coin);
-                return false;
             }
         }
         return false;
     }
 
-    public Double addCoin(Coin coin){
+
+    public Double addOrReturnCoin(Coin coin){
         if(checkCoinIsAccepted(coin)) {
             return currentBalance += coin.getValue();
+        } else if (checkCoinIsRejected(coin)) {
+            returnedCoins.add(coin);
+            return currentBalance;
+        } else {
+            returnedCoins.add(coin);
+            return currentBalance;
         }
-        return currentBalance;
     }
 
     public void addProductToVendingMachine(IPurchaseable product){

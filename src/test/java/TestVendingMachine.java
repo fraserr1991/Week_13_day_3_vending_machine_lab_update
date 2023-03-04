@@ -19,6 +19,8 @@ public class TestVendingMachine {
     Coin coin1;
     Coin coin2;
     Coin coin3;
+    Coin coin4;
+
 
     Cola coke;
 
@@ -28,25 +30,26 @@ public class TestVendingMachine {
         coin1 = new Coin(.10);
         coin2 = new Coin(1.0);
         coin3 = new Coin(.02);
+        coin4 = new Coin(-1);
         coke = new Cola("coke", "cola", 1.0);
     }
 
     @Test
     public void acceptsValidCoins(){
-        vendingMachine.addCoin(coin1);
+        vendingMachine.addOrReturnCoin(coin1);
         assertEquals(0.10, vendingMachine.getCurrentBalance(),0.0);
     }
 
     @Test public void rejectsInvalidCoins(){
-        vendingMachine.addCoin(coin3);
+        vendingMachine.addOrReturnCoin(coin3);
         assertEquals(0, vendingMachine.getCurrentBalance(),0.0);
     }
     @Test
     public void addsOnlyValidCoinsToCurrentBalance(){
-        vendingMachine.addCoin(coin1);
-        vendingMachine.addCoin(coin2);
-        vendingMachine.addCoin(coin3);
-        vendingMachine.addCoin(coin1);
+        vendingMachine.addOrReturnCoin(coin1);
+        vendingMachine.addOrReturnCoin(coin2);
+        vendingMachine.addOrReturnCoin(coin3);
+        vendingMachine.addOrReturnCoin(coin1);
         //Hacky? The result was 1.2000000002, and I needed to convert the number rec to the real number.
         assertEquals("1.20", df.format(vendingMachine.getCurrentBalance()));
 
@@ -54,7 +57,13 @@ public class TestVendingMachine {
 
     @Test
     public void returnRejectedCoins(){
-        vendingMachine.addCoin(coin3);
+        vendingMachine.addOrReturnCoin(coin3);
+        assertEquals(1, vendingMachine.getSizeOfReturnedCoins());
+    }
+
+    @Test
+    public void checkAnInvalidCoinIsReturned(){
+        vendingMachine.addOrReturnCoin(coin4);
         assertEquals(1, vendingMachine.getSizeOfReturnedCoins());
     }
 
@@ -93,10 +102,10 @@ public class TestVendingMachine {
 
     @Test
     public void hasRequiredBalance(){
-        vendingMachine.addCoin(coin1);
-        vendingMachine.addCoin(coin2);
-        vendingMachine.addCoin(coin3);
-        vendingMachine.addCoin(coin1);
+        vendingMachine.addOrReturnCoin(coin1);
+        vendingMachine.addOrReturnCoin(coin2);
+        vendingMachine.addOrReturnCoin(coin3);
+        vendingMachine.addOrReturnCoin(coin1);
         assertEquals("Enjoy your product!", vendingMachine.buyProductFromVendingMachine(101));
         assertEquals("0.00", df.format(vendingMachine.getCurrentBalance()));
 
@@ -104,12 +113,20 @@ public class TestVendingMachine {
 
     @Test
     public void requiredBalanceNotMet(){
-        vendingMachine.addCoin(coin1);
+        vendingMachine.addOrReturnCoin(coin1);
         assertEquals("Balance inadequate, please insert more coins and try again", vendingMachine.buyProductFromVendingMachine(101));
         assertEquals("0.10", df.format(vendingMachine.getCurrentBalance()));
 
     }
-    
+
+    @Test
+    public void ANegativeValueCoinIsNotAccepted(){
+        vendingMachine.addOrReturnCoin(coin4);
+        assertEquals("Balance inadequate, please insert more coins and try again", vendingMachine.buyProductFromVendingMachine(101));
+        assertEquals("0.00", df.format(vendingMachine.getCurrentBalance()));
+
+    }
+
 //    @Test
 //    public void removeProductFromProducts(){
 //
